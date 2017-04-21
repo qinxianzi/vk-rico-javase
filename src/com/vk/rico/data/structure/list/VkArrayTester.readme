@@ -1,0 +1,39 @@
+扩展知识：
+
+1)、
+/*
+* Arrays类中的copyOf方法
+* 拷贝original数组，newLength指定拷贝元素的个数，若newLength小于original数组的长度，则 截断；若newLength大于original数组的长度、使用null填充；<br/>
+* 从original第0个元素开始往后拷贝，里面调用的方法是：System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
+* 返回拷贝后的数组
+*/
+public static <T> T[] copyOf(T[] original, int newLength)
+ 
+/**
+ * System类中的arraycopy方法
+ * 拷贝数组，只能从前往后拷贝，而不能从后往前拷贝，如果src、dest指向同一个数组，则先将src指定的元素拷贝到一个临时数组中，再将临时数组中的元素拷贝到dest中
+ * @param src 原数组
+ * @param srcPos 从原数组中指定的位置开始拷贝，从0开始
+ * @param dest 目标数组
+ * @param destPos 拷贝到目标数组的开始位置，往后依次存储length个元素，从0开始
+ * @param length 从原数组中拷贝元素的个数（从srcPos开始往后数length个元素，包括srcPos位置的元素）
+ */
+public static native void arraycopy(Object src,  int  srcPos,
+        Object dest, int destPos,
+        int length){}
+                                        
+ 2)、
+ //size先使用，后增加
+ elementData[size++] = e;
+ 
+ 总结：
+ 数组就是一个简单的线性序列，逻辑上相邻的元素，物理上也相邻；
+ 数组的优点是效率高，但为此，所付出的代价就是数组对象的大小被固定
+数组的特点是存储空间是连续性的（物理上是连续的），Java中没有动态数组，也就是说，在Java中，创建数组时，必须指定数组的长度（即元素的个数），创建数组之后，就不能动态修改数组的长度（如增加一个元素、删除一个元素等等操作）
+ 
+Java中数组的特性
+http://www.cnblogs.com/NewMan13/p/6193129.html
+
+线性表，线性表和链表的区别
+http://www.cnblogs.com/wincai/p/5893475.html
+ 

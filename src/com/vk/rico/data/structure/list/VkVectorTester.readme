@@ -1,0 +1,18 @@
+Vector特性：
+	1)、Vector的无参构造器里面做了些什么操作
+		Vector里面是用数组(Object[])来存储数据的，调用Vector的无参构造器时，会创建一个 数组，数组的长度是10。
+		
+		//创建Vector：指定初始容量（默认初始容量是10）、增长容量（扩容时增长多少容量）
+		public Vector(int initialCapacity, int capacityIncrement) {
+	        super();
+	        if (initialCapacity < 0)
+	            throw new IllegalArgumentException("Illegal Capacity: "+
+	                                               initialCapacity);
+	        this.elementData = new Object[initialCapacity];
+	        this.capacityIncrement = capacityIncrement;
+	    }
+	
+	2)、扩容
+		创建Vector时可以指定"增长容量"参数，若该参数大于0，则则每次扩容时，增长指定数量的容量；若没指定或指定的值小于等于0，则扩容一倍。
+
+	3)、Vector中的方法有做同步，因此是线程安全的。

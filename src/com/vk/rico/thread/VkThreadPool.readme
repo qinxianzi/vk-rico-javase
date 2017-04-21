@@ -1,0 +1,90 @@
+线程池java.util.concurrent.ThreadPoolExecutor
+
+创建线程池，并用给定的参数初始化该线程池（但线程池不会运行）
+线程池刚创建时，里面没有一个线程。任务队列是作为参数传进来的。不过，就算队列里面有任务，线程池也不会马上执行它们。
+ThreadPoolExecutor(int corePoolSize, 
+				   int maximumPoolSize, 
+				   long keepAliveTime, 
+				   TimeUnit unit, 
+				   BlockingQueue<Runnable> workQueue, 
+				   ThreadFactory threadFactory, 
+				   RejectedExecutionHandler handler);
+corePoolSize核心线程数，线程池中始终保持的线程数，即使这些线程处于空闲状态，也不会被终止，除非allowCoreThreadTimeOut为true。
+    executor.allowCoreThreadTimeOut(true);//executor是线程池对象，allowCoreThreadTimeOut默认值为false。
+maximumPoolSize最大线程数
+keepAliveTime当线程池中的线程数大于核心线程数时，多余的线程空闲时间（即在keepAliveTime时间内，多余的线程不会被终止）
+unit是TimeUnit枚举值，表示keepAliveTime的时间单位
+workQueue工作队列，用于保存任务，即当任务被执行之前，就保存在该工作队列中；该队列只保存execute方法提交的Runnable任务；execute方法是线程池的方法，用于提交任务，任务必须是Runnable的实现类。
+threadFactory线程工厂，当线程池创建新的线程时，就是通过该工厂来创建的。
+handler当执行被阻塞时的回调；当线程池满了（达到了最大线程数）。
+
+当一个线程完成任务时，它会从队列中取下一个任务来执行
+
+
+Executes the given task sometime in the future. The task may execute in a new thread or in an existing pooled thread. If the task cannot be submitted for execution, either because this executor has been shutdown or because its capacity has been reached, the task is handled by the current RejectedExecutionHandler.
+
+/*
+在接下来的某个时间点执行给定的任务（也就是说任务不会被立刻执行）；任务可能会在一个新的线程中执行，也可能在空闲的线程中执行（线程池中空闲的线程）；
+如果任务无法被提交执行（当线程池已经关闭，或者线程池的容量已经满了），那么会被线程池中的RejectedExecutionHandler对象处理；
+*/
+public void execute(Runnable command);
+当试图通过 excute方法将一个 Runnable任务添加到线程池中时，按照如下顺序来处理：
+1)、如果线程池中的线程数量少于 corePoolSize，即使线程池中有空闲线程，也会创建一个新的线程来执行新添加的任务；
+2)、如果线程池中的线程数量大于等于 corePoolSize，但缓冲队列 workQueue未满，则将新添加的任务放到 workQueue中，按照 FIFO的原则依次等待执行（线程池中有线程空闲出来后依次将缓冲队列中的任务交付给空闲的线程执行）；
+3)、如果线程池中的线程数量大于等于 corePoolSize，且缓冲队列 workQueue已满，但线程池中的线程数量小于 maximumPoolSize，则会创建新的线程来处理被添加的任务；
+4)、如果线程池中的线程数量等于 maximumPoolSize，切工作队列也满了，即线程池满了；则由RejectedExecutionHandler处理
+线程池满了：线程数量等于 maximumPoolSize，且工作队列也满了。
+RejectedExecutionHandler有以下四个子类：
+	AbortPolicy 任务执行失败，直接抛出异常，即告诉调用者"我不能再接受任务了"。
+	CallerRunsPolicy：直接在调用者线程上执行任务，除非线程池已经被关闭，这时将丢弃任务。
+	DiscardOldestPolicy：将工作队列中最老的一个任务移出（直接丢弃），再将该任务加入工作队列中。
+	DiscardPolicy：不做任何处理，直接丢弃该任务。
+
+当线程池中的线程数量大于 corePoolSize 时，如果里面有线程的空闲时间超过了 keepAliveTime，就将其移除线程池，这样，可以动态地调整线程池中线程的数量。
+
+
+
+
+
+
+==================================================================================================================================
+java.util.concurrent.BlockingQueue
+BlockingQueue类有三种方法将任务添加到阻塞队列里面，然而如何区别三种方法的不同呢，其实在阻塞队列未满的情况下结果是相同的，都是将任务添加到阻塞队列里面，区别就在于当阻塞队列已经满的时候：
+
+
+如果阻塞队列容量未满时，立即将任务添加到队列中，添加成功则返回true，添加失败则抛出IllegalStateException运行时异常（队列已满），对于容量受限的阻塞队列，优先使用boolean offer(E e)方法
+public boolean add(E e);
+
+如果阻塞队列容量未满时，立即将任务添加到队列中，添加成功则返回true，添加失败则返回false
+boolean offer(E e);
+
+添加任务到队列中，若队列已满，则等待，直到队列中有可用位置，即该方法一直阻塞（即等待，直到线程池中有线程运行完毕（此时队列中必然会有空余的位置），可以加入队列为止）
+void put(E e) throws InterruptedException;
+
+那么线程池的排除策略是什么样呢，一般按如下规律执行：
+A.如果运行的线程少于 corePoolSize，则 Executor始终首选添加新的线程，而不进行排队。
+B.如果运行的线程等于或多于 corePoolSize，则 Executor始终首选将请求加入队列，而不添加新的线程（若阻塞队列已满，且线程数<maximumPoolSize，则直接创建新线程处理之后提交的任务，而不是将该任务加入到队列）。
+C.如果无法将请求加入队列，则创建新的线程，除非创建此线程超出 maximumPoolSize，在这种情况下，任务将被拒绝。
+
+
+ 核心线程数可理解为建议值，即建议使用的线程数，或者依据CPU核数
+remove，poll， take三种移除队列中任务的方法只在队列为空的时候有区别， remove为抛异常，poll为返回boolean值， take等待直到有线程可以被移除。
+==================================================================================================================================
+
+
+
+
+
+重点参考文章：
+http://wiki.jikexueyuan.com/project/java-concurrency/executor.html
+http://blog.csdn.net/shixing_11/article/details/7109471
+
+
+	
+	
+
+
+
+
+
+

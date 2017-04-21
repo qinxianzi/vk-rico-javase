@@ -1,0 +1,91 @@
+ArrayList特性：
+	1)、ArrayList里面使用数组来存储元素的（Object[]）,默认容量是10。
+	2)、构造器
+		private static final Object[] EMPTY_ELEMENTDATA = {};
+		public ArrayList(int initialCapacity) {
+			//initialCapacity是数组的初始元素个数（即初始容量）
+	        if (initialCapacity > 0) {
+	        	//初始容量大于0时，创建指定元素个数的Object数组
+	            this.elementData = new Object[initialCapacity];
+	        } else if (initialCapacity == 0) {
+	        	//初始容量为0时，创建空数组
+	            this.elementData = EMPTY_ELEMENTDATA;
+	        } else {
+	        	//初始容量必须大于等于0，否则抛出运行时异常（即IllegalArgumentException异常）
+	            throw new IllegalArgumentException("Illegal Capacity: "+ initialCapacity);
+	        }
+        }
+    
+		
+		private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
+		public ArrayList() {
+			创建一个空数组（数组的长度为0）
+	        this.elementData = DEFAULTCAPACITY_EMPTY_ELEMENTDATA;
+	    }
+		
+		
+		Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};
+		DEFAULTCAPACITY_EMPTY_ELEMENTDATA[0] = "abcd";
+		System.out.println(DEFAULTCAPACITY_EMPTY_ELEMENTDATA.length);
+		报异常：Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 0
+		思考：Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = null时，以上代码报什么错？
+		
+	3)、	扩容
+		扩容时，需要将就数组中元素拷贝到新数组中，因此频繁扩容，会影响ArrayList的效率。
+		新数组长度  = 原Object[]数组长度  + 原Object[]数组长度的1/2。
+		建议数组的初始容量是2的倍数，这样扩容后，新数组的长度和旧数组的的长度比值是3比2。
+	
+	4)、size属性
+	 	ArrayList里面有个size属性，private int size。
+	 	这个属性表示ArrayList里面Object[]数组填充的个数，但并不是Object[]数组的长度，如ArrayList的size方法返回2，表示ArrayList里面有两个元素（即ArrayList中Object[]数组的前两个位置被填充了数据），
+	 	但Object[]数组的长度（即length属性）可能是10（数组后续的8个位置没有填充数据，为null）。
+	
+	5)、ArrayList中的方法没有做同步，因此是非线程安全的。
+	6)、ArrayList中元素位置的移动，是通过拷贝数组的方式来实现的。
+	7)、从ArrayList中间新增元素时，数组中的位置需要向后移动，可能会进行扩容。
+	8)、从ArrayList中间删除元素时，数组中的位置需要向前移动，数组的元素总个数不会发生更改（即length不会，因为Java中没有动态数组），只是将某个位置置为null。
+	9)、修改ArrayList中的元素时，不会移动数组元素的位置。
+	
+总结：
+ArrayList是线性表的"顺序存储"方式的实现，即顺序表
+
+API：
+//将元素添加到数组最为尾端，可能会扩容，但不会移动位置（即不会进行数组的拷贝）
+public boolean add(E e)
+
+//将元素添加到指定的位置，可能会扩容，会移动位置
+public void add(int index, E element)
+
+//批量新增，将元素添加到数组最尾端
+public boolean addAll(Collection<? extends E> c)
+
+//批量新增，将元素添加到指定的位置
+public boolean addAll(int index, Collection<? extends E> c)
+	 	
+//通过下标删除指定位置的元素，当删除最尾端的元素时，数组的元素位置不会发生移动，此时删除效率高；否则数组的元素位置会发生移动
+public E remove(int index)
+
+//批量删除元素
+public boolean removeAll(Collection<?> c)
+
+//删除ArrayList中的某个值（效率较低，需要从第0个位置开始遍历整个数组）
+public boolean remove(Object o);
+
+//判断ArrayList中是否包含某个值
+public boolean contains(Object o) {
+	return indexOf(o) >= 0;
+}
+
+//检索某个值在ArrayList中的下标，效率较低，因为需要从数组的第0个位置开始遍历
+public int indexOf(Object o) {
+	if (o == null) {
+		for (int i = 0; i < size; i++)
+			if (elementData[i] == null)
+				return i;
+	} else {
+		for (int i = 0; i < size; i++)
+			if (o.equals(elementData[i])) //调用equals方法比较两个对象是否相等
+				return i;
+	}
+	return -1;
+}

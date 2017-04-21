@@ -1,0 +1,37 @@
+wait：释放CPU执行权，且释放占用的对象锁，线程进入阻塞状态（操作系统会挂起当前线程），wait后面的代码不会被执行：
+public synchronized void put(V v) throws InterruptedException {
+	while(isFull()){
+		this.wait();
+	}
+	doPut(v);
+	this.notifyAll();
+}
+
+public synchronized V take() throws InterruptedException {
+	while (isEmpty()) {
+		this.wait();
+	}
+	V v = doTake();
+	this.notifyAll();
+	return v;
+}
+1)、wait、notify、notifyAll三个方法必须在相应的内部锁上调用，如上面个两个同步方法，内部锁是this，如果没有在内部锁上调用，则会抛出异常，如下方法：
+	public V take() throws InterruptedException {
+		while (isEmpty()) {
+			this.wait();
+		}
+		V v = doTake();
+		this.notifyAll();
+		return v;
+	}
+	这个方法没有同步，没有内部锁，调用wait、notifyAll方法将抛出异常。
+2、调用wait方法后，当前线程将进入内部锁的阻塞队列中（也称为条件队列，传统队列中的元素是数据项，而条件队列中的元素是等待相关条件的线程），如果该线程要继续执行，必须先获得内部锁，然后得到CPU的执行权：
+	public synchronized V take() throws InterruptedException {
+		while (isEmpty()) {
+			this.wait(); //线程进入锁的阻塞队列中，释放锁和CPU执行权，OS将线程挂起（即线程被阻塞），因此后续代码不会被执行。
+		}
+		V v = doTake(); //当线程再次执行，并且复核相关条件时（isEmpty()返回false），继续从这里执行。
+		this.notifyAll(); //唤醒内部锁条件队列中的所有线程，条件队列中的所有线程都有机会获得内部锁，但同一时刻只能有一个线程成功得到内部锁
+		//this.notify();//与notifyAll()的区别？
+		return v;
+	}

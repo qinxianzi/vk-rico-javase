@@ -1,0 +1,55 @@
+HashMap:
+	1)、hash算法
+	2)、Object对象上的hashcode方法和equeals方法
+	3)、HashMap扩容
+		倍数扩容方式，数据的拷贝
+	4)、hash碰撞（即hash冲突）
+		当同一个节点的hash碰撞数达到8个时，会转换成红黑树存储。
+	5)、0.75加载因子
+		HashMap在时间和空间上的一个权衡，以空间换时间
+	6)、HashMap的容量为什么是2的n次方(n>=0)
+
+		
+		
+jdk1.8.0_91
+扩容：
+	//创建一个HashMap对象
+  	Map<String, String> val = new UebHashMap<String, String>(8, 0.75f);
+	   	this.loadFactor = 0.75f;
+		this.threshold = 8;
+		this.table = null;
+		
+	//首次往HashMap中存放元素
+	val.put("Tester0", "Tester0");
+		调用resize()方法初始化table属性
+			this.table = new Node[8]
+			this.threshold = 8 * 0.75 = 6
+			if (++size > threshold) {
+				resize();
+			}
+			size = 1;
+	//继续存放元素
+	val.put("Tester1", "Tester1");
+	val.put("Tester2", "Tester2");
+	val.put("Tester3", "Tester3");
+	val.put("Tester4", "Tester4");
+	val.put("Tester5", "Tester5");
+	
+	//存Tester5时，将进行扩容
+	val.put("Tester6", "Tester6");
+	this.threshold = 16 * 0.75 = 12
+	this.table = new Node[16] //容量翻倍
+	
+	val.put("Tester7", "Tester7");	
+			
+
+哈希冲突：关键字不同的元素被映射到了同一个内存位置，包括由同义词冲突和非同义词冲突。
+
+hash算法的数学原理是什么，如何保证尽可能少的碰撞？			
+https://www.zhihu.com/question/20507188
+
+
+解决Hash碰撞冲突方法总结
+http://blog.csdn.net/zeb_perfect/article/details/52574915
+
+http://www.coselding.cn/article/2016-05-31/-1127151883.html

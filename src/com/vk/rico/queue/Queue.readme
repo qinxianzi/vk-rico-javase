@@ -1,0 +1,21 @@
+﻿Queue接口，即队列，继承Collection接口
+public interface Queue<E> extends Collection<E> {
+
+     //添加非空元素到队列，成功时，返回true，只返回true，不会返回false，失败（没有可用空间）时会扔出IllegalStateException异常（如没有可用的空间）
+     boolean add(E e);
+
+     //添加非空元素到队列，成功时，返回true，失败（没有可用空间）时则返回false；当使用固定大小的队列时，该方法要由于add方法
+     boolean offer(E e);
+
+     //删除并返回队列的头部元素，当队列为空时，抛出NoSuchElementException异常
+     E remove();
+
+     //删除并返回队列的头部元素，当队列为空时，返回null
+     E poll();
+
+     //返回队列的头部元素（不会删除），当队列为空时，抛出NoSuchElementException异常
+     E element();
+  
+     //返回队列的头部元素（不会删除），当队列为空时，返回null
+     E peek();
+}

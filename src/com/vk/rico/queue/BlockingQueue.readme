@@ -1,0 +1,20 @@
+public interface BlockingQueue<E> extends Queue<E> {
+	
+	// 添加非空元素到队列中，如果没有可用的空间时，线程会等待（即线程阻塞），直到有可用的空间为止
+	void put(E e) throws InterruptedException;
+
+	// 添加非空元素到队列中，如果没有可用空间时，线程会等待指定的时间；成功则返回true，超时则返回false
+	boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException;
+
+	// 删除并返回队列的头部元素，当队列为空时（即没有可用的元素），线程将等待（即线程阻塞），直到有可用的元素为止
+	E take() throws InterruptedException;
+
+	// 删除并返回队列的头部元素，当队列为空时（即没有可用的元素），程会等待指定的时间，超时则返回null
+	E poll(long timeout, TimeUnit unit) throws InterruptedException;
+
+	int remainingCapacity();
+
+	int drainTo(Collection<? super E> c);
+
+	int drainTo(Collection<? super E> c, int maxElements);
+}
