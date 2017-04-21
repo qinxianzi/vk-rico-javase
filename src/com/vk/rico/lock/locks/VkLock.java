@@ -305,19 +305,11 @@ public interface VkLock {
 
 	/**
 	 * 释放锁。
-	 */
-	/**
-	 * Releases the lock.
-	 *
 	 * <p>
-	 * <b>Implementation Considerations</b>
-	 *
-	 * <p>
-	 * A {@code Lock} implementation will usually impose restrictions on which
-	 * thread can release a lock (typically only the holder of the lock can
-	 * release it) and may throw an (unchecked) exception if the restriction is
-	 * violated. Any restrictions and the exception type must be documented by
-	 * that {@code Lock} implementation.
+	 * <b>实现注意事项</b><br/>
+	 * Lock实现通常对哪个线程可以释放锁施加了限制（通常只有锁的保持者可以释放它），如果违背了这个限制，可能会抛出（未经检查的）异常。<br/>
+	 * Lock实现必须对所有限制和异常类型进行记录。
+	 * </p>
 	 */
 	void unlock();
 

@@ -2,7 +2,6 @@ package com.vk.rico.lock.locks;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
@@ -16,7 +15,7 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	 * nonfair versions below. Uses AQS state to represent the number of holds
 	 * on the lock.
 	 */
-	abstract static class Sync extends AbstractQueuedSynchronizer {
+	abstract static class Sync extends VkAbstractQueuedSynchronizer {
 		private static final long serialVersionUID = -5179523762034025860L;
 
 		/**
@@ -94,20 +93,20 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	}
 
 	/**
-	 * Sync object for non-fair locks
+	 * 同步对象的非公平锁
 	 */
 	static final class NonfairSync extends Sync {
 		private static final long serialVersionUID = 7316153563782823691L;
 
 		/**
-		 * Performs lock. Try immediate barge, backing up to normal acquire on
-		 * failure.
+		 * 尝试直接闯入（分公平锁有闯入现象），闯入失败时，执行acquire方法
 		 */
 		final void lock() {
-			if (compareAndSetState(0, 1))
+			if (compareAndSetState(0, 1)) {
 				setExclusiveOwnerThread(Thread.currentThread());
-			else
+			} else {
 				acquire(1);
+			}
 		}
 
 		protected final boolean tryAcquire(int acquires) {
@@ -116,7 +115,7 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	}
 
 	/**
-	 * Sync object for fair locks
+	 * 同步对象的公平锁
 	 */
 	static final class FairSync extends Sync {
 		private static final long serialVersionUID = -3000897897090466540L;
@@ -359,16 +358,13 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	}
 
 	/**
-	 * Attempts to release this lock.
-	 *
+	 * 试图释放此锁。
 	 * <p>
-	 * If the current thread is the holder of this lock then the hold count is
-	 * decremented. If the hold count is now zero then the lock is released. If
-	 * the current thread is not the holder of this lock then
-	 * {@link IllegalMonitorStateException} is thrown.
-	 *
-	 * @throws IllegalMonitorStateException
-	 *             if the current thread does not hold this lock
+	 * 如果当前线程是此锁所有者，则将保持计数减 1。如果保持计数现在为 0，则释放该锁。如果当前线程不是此锁的持有者，则抛出
+	 * IllegalMonitorStateException。
+	 * </p>
+	 * @throws： IllegalMonitorStateException - 如果当前线程没有保持此锁
+	 * 
 	 */
 	public void unlock() {
 		sync.release(1);
@@ -620,9 +616,9 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	public boolean hasWaiters(Condition condition) {
 		if (condition == null)
 			throw new NullPointerException();
-		if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+		if (!(condition instanceof VkAbstractQueuedSynchronizer.ConditionObject))
 			throw new IllegalArgumentException("not owner");
-		return sync.hasWaiters((AbstractQueuedSynchronizer.ConditionObject) condition);
+		return sync.hasWaiters((VkAbstractQueuedSynchronizer.ConditionObject) condition);
 	}
 
 	/**
@@ -645,9 +641,9 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	public int getWaitQueueLength(Condition condition) {
 		if (condition == null)
 			throw new NullPointerException();
-		if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+		if (!(condition instanceof VkAbstractQueuedSynchronizer.ConditionObject))
 			throw new IllegalArgumentException("not owner");
-		return sync.getWaitQueueLength((AbstractQueuedSynchronizer.ConditionObject) condition);
+		return sync.getWaitQueueLength((VkAbstractQueuedSynchronizer.ConditionObject) condition);
 	}
 
 	/**
@@ -672,9 +668,9 @@ public class VkReentrantLock implements Lock, java.io.Serializable {
 	protected Collection<Thread> getWaitingThreads(Condition condition) {
 		if (condition == null)
 			throw new NullPointerException();
-		if (!(condition instanceof AbstractQueuedSynchronizer.ConditionObject))
+		if (!(condition instanceof VkAbstractQueuedSynchronizer.ConditionObject))
 			throw new IllegalArgumentException("not owner");
-		return sync.getWaitingThreads((AbstractQueuedSynchronizer.ConditionObject) condition);
+		return sync.getWaitingThreads((VkAbstractQueuedSynchronizer.ConditionObject) condition);
 	}
 
 	/**

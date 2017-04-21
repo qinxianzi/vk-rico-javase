@@ -1,0 +1,12 @@
+AbstractQueuedSynchronizer简称AQS，AQS依赖与CAS：
+
+重点参考文章：
+http://www.cnblogs.com/xrq730/p/4979021.html
+http://www.cnblogs.com/xrq730/p/4976007.html
+http://blog.csdn.net/fw0124/article/details/6671447
+
+学习代码下载：
+http://www.cnblogs.com/mantu/p/5784600.html
+
+JDK中文API地址：
+http://tool.oschina.net/apidocs/apidoc?api=jdk-zh
